@@ -209,6 +209,16 @@ padding:15px;
 
 <h3>Riwayat Transaksi</h3>
 
+<select id="filterKategori" onchange="filterKategori()">
+<option value="all">Semua Transaksi</option>
+<option>Makan</option>
+<option>Transport</option>
+<option>Belanja</option>
+<option>Gaji</option>
+<option>Hiburan</option>
+<option>Lainnya</option>
+</select>
+
 <div class="table-container">
 <table>
 <thead>
@@ -239,10 +249,10 @@ Money Tracker • Local Storage
 <script>
 
 let transaksi=[];
+let kategoriFilter="all";
 
 let currentMonthKey=new Date().getFullYear()+"-"+(new Date().getMonth()+1);
 
-// TOTAL KESELURUHAN
 let totalMasukAll=parseInt(localStorage.getItem("totalMasukAll"))||0;
 let totalKeluarAll=parseInt(localStorage.getItem("totalKeluarAll"))||0;
 
@@ -251,13 +261,10 @@ return "Rp "+angka.toLocaleString("id-ID");
 }
 
 function simpanData(){
-
 localStorage.setItem("dataTransaksi",JSON.stringify(transaksi));
 localStorage.setItem("bulanTransaksi",currentMonthKey);
-
 localStorage.setItem("totalMasukAll",totalMasukAll);
 localStorage.setItem("totalKeluarAll",totalKeluarAll);
-
 }
 
 function loadData(){
@@ -276,16 +283,14 @@ transaksi=JSON.parse(data);
 
 }
 
-function updateRingkasan(){
+function updateRingkasan(data){
 
 let masuk=0;
 let keluar=0;
 
-transaksi.forEach(t=>{
-
+data.forEach(t=>{
 if(t.jenis==="masuk") masuk+=t.jumlah;
 if(t.jenis==="keluar") keluar+=t.jumlah;
-
 });
 
 let saldo=masuk-keluar;
@@ -294,8 +299,27 @@ document.getElementById("totalMasuk").innerText=formatRupiah(masuk);
 document.getElementById("totalKeluar").innerText=formatRupiah(keluar);
 document.getElementById("saldo").innerText=formatRupiah(saldo);
 
-document.getElementById("totalMasukAll").innerText=formatRupiah(totalMasukAll);
-document.getElementById("totalKeluarAll").innerText=formatRupiah(totalKeluarAll);
+let masukAll=0;
+let keluarAll=0;
+
+if(kategoriFilter==="all"){
+
+masukAll=totalMasukAll;
+keluarAll=totalKeluarAll;
+
+}else{
+
+transaksi.forEach(t=>{
+if(t.kategori===kategoriFilter){
+if(t.jenis==="masuk") masukAll+=t.jumlah;
+if(t.jenis==="keluar") keluarAll+=t.jumlah;
+}
+});
+
+}
+
+document.getElementById("totalMasukAll").innerText=formatRupiah(masukAll);
+document.getElementById("totalKeluarAll").innerText=formatRupiah(keluarAll);
 
 }
 
@@ -305,7 +329,13 @@ let tbody=document.getElementById("tabelTransaksi");
 
 tbody.innerHTML="";
 
-transaksi.forEach((t,index)=>{
+let dataTampil=transaksi;
+
+if(kategoriFilter!=="all"){
+dataTampil=transaksi.filter(t=>t.kategori===kategoriFilter);
+}
+
+dataTampil.forEach((t,index)=>{
 
 let badge=t.jenis==="masuk"
 ?'<span class="badgeMasuk">Masuk</span>'
@@ -324,6 +354,8 @@ tbody.innerHTML+=row;
 
 });
 
+updateRingkasan(dataTampil);
+
 }
 
 function tambahTransaksi(){
@@ -338,8 +370,7 @@ alert("Isi data terlebih dahulu");
 return;
 }
 
-let now=new Date();
-let tanggal=now.toLocaleDateString("id-ID");
+let tanggal=new Date().toLocaleDateString("id-ID");
 
 transaksi.push({tanggal,jenis,kategori,jumlah,keterangan});
 
@@ -348,7 +379,6 @@ else totalKeluarAll+=jumlah;
 
 simpanData();
 renderTabel();
-updateRingkasan();
 
 document.getElementById("kategori").value="";
 document.getElementById("jumlah").value="";
@@ -362,7 +392,14 @@ transaksi.splice(index,1);
 
 simpanData();
 renderTabel();
-updateRingkasan();
+
+}
+
+function filterKategori(){
+
+kategoriFilter=document.getElementById("filterKategori").value;
+
+renderTabel();
 
 }
 
@@ -384,8 +421,6 @@ a.click();
 
 }
 
-// FORMAT INPUT RUPIAH
-
 const jumlahInput=document.getElementById("jumlah");
 
 jumlahInput.addEventListener("input",function(e){
@@ -403,7 +438,6 @@ e.target.value="Rp "+Number(angka).toLocaleString("id-ID");
 
 loadData();
 renderTabel();
-updateRingkasan();
 
 </script>
 
