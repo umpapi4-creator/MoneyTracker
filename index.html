@@ -24,18 +24,6 @@ color:white;
 padding:30px 20px;
 }
 
-header h1{
-margin:0;
-font-weight:600;
-letter-spacing:0.5px;
-}
-
-header p{
-margin-top:5px;
-opacity:0.9;
-font-size:14px;
-}
-
 .container{
 max-width:1050px;
 margin:auto;
@@ -48,11 +36,6 @@ padding:22px;
 border-radius:16px;
 margin-bottom:20px;
 box-shadow:0 15px 35px rgba(0,0,0,0.15);
-}
-
-.card h3{
-margin-top:0;
-font-weight:500;
 }
 
 .summary{
@@ -68,36 +51,19 @@ color:white;
 text-align:center;
 }
 
-.summary .masuk{
-background:linear-gradient(135deg,#43e97b,#38f9d7);
-}
-
-.summary .keluar{
-background:linear-gradient(135deg,#ff758c,#ff7eb3);
-}
-
-.summary .saldo{
-background:linear-gradient(135deg,#667eea,#764ba2);
-}
-
-.summary h3{
-margin:0;
-font-size:15px;
-font-weight:500;
-}
+.masuk{background:linear-gradient(135deg,#43e97b,#38f9d7);}
+.keluar{background:linear-gradient(135deg,#ff758c,#ff7eb3);}
+.saldo{background:linear-gradient(135deg,#667eea,#764ba2);}
 
 .summary p{
-font-size:24px;
-margin-top:5px;
+font-size:22px;
 font-weight:600;
 }
 
 form{
-width:100%;
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
 gap:10px;
-margin-top:10px;
 }
 
 input,select{
@@ -105,13 +71,6 @@ padding:11px;
 border-radius:8px;
 border:1px solid #ddd;
 font-family:'Poppins';
-font-size:14px;
-}
-
-input:focus,select:focus{
-outline:none;
-border-color:#4facfe;
-box-shadow:0 0 0 2px rgba(79,172,254,0.2);
 }
 
 button{
@@ -120,46 +79,37 @@ border:none;
 border-radius:8px;
 background:linear-gradient(135deg,#4facfe,#00f2fe);
 color:white;
-font-weight:500;
 cursor:pointer;
-transition:0.25s;
-}
-
-button:hover{
-transform:translateY(-2px);
-box-shadow:0 10px 20px rgba(0,0,0,0.2);
 }
 
 .deleteBtn{
-background:linear-gradient(135deg,#ff5f6d,#ffc371);
-font-size:13px;
+background:#ff5f6d;
 padding:6px 10px;
 }
 
-.table-container{overflow-x:auto;width:100%;}
+.table-container{
+overflow-x:auto;
+overflow-y:auto;
+max-height:260px;
+}
 
 table{
 width:100%;
 border-collapse:collapse;
 margin-top:10px;
-font-size:14px;
 }
 
 th{
 background:#4facfe;
 color:white;
 padding:10px;
-text-align:left;
-font-weight:500;
+position:sticky;
+top:0;
 }
 
 td{
 padding:10px;
 border-bottom:1px solid #eee;
-}
-
-tr:hover{
-background:#f5fbff;
 }
 
 .badgeMasuk{
@@ -181,9 +131,7 @@ font-size:12px;
 footer{
 text-align:center;
 color:white;
-font-size:13px;
 padding:15px;
-opacity:0.9;
 }
 
 </style>
@@ -192,7 +140,7 @@ opacity:0.9;
 
 <header>
 <h1>💰 Money Tracker</h1>
-<p>Pencatatan Penggunaan Uang Bulanan</p>
+<p>Pencatatan Penggunaan Uang</p>
 </header>
 
 <div class="container">
@@ -200,23 +148,34 @@ opacity:0.9;
 <div class="card summary">
 
 <div class="masuk">
-<h3>Total Uang Masuk</h3>
+<h3>Total Masuk (Bulan)</h3>
 <p id="totalMasuk">Rp 0</p>
 </div>
 
 <div class="keluar">
-<h3>Total Uang Keluar</h3>
+<h3>Total Keluar (Bulan)</h3>
 <p id="totalKeluar">Rp 0</p>
 </div>
 
 <div class="saldo">
-<h3>Sisa Saldo</h3>
+<h3>Saldo</h3>
 <p id="saldo">Rp 0</p>
+</div>
+
+<div class="masuk">
+<h3>Total Masuk Keseluruhan</h3>
+<p id="totalMasukAll">Rp 0</p>
+</div>
+
+<div class="keluar">
+<h3>Total Keluar Keseluruhan</h3>
+<p id="totalKeluarAll">Rp 0</p>
 </div>
 
 </div>
 
 <div class="card">
+
 <h3>Tambah Transaksi</h3>
 
 <form onsubmit="event.preventDefault(); tambahTransaksi();">
@@ -226,9 +185,17 @@ opacity:0.9;
 <option value="keluar">Uang Keluar</option>
 </select>
 
-<input type="text" id="kategori" placeholder="Kategori (makan, gaji, dll)">
+<select id="kategori">
+<option value="">Pilih kategori</option>
+<option>Makan</option>
+<option>Transport</option>
+<option>Belanja</option>
+<option>Gaji</option>
+<option>Hiburan</option>
+<option>Lainnya</option>
+</select>
 
-<input type="number" id="jumlah" placeholder="Jumlah uang">
+<input type="text" id="jumlah" placeholder="Jumlah uang">
 
 <input type="text" id="keterangan" placeholder="Keterangan">
 
@@ -239,6 +206,7 @@ opacity:0.9;
 </div>
 
 <div class="card">
+
 <h3>Riwayat Transaksi</h3>
 
 <div class="table-container">
@@ -257,69 +225,93 @@ opacity:0.9;
 </table>
 </div>
 
+<br>
+<button onclick="exportExcel()">Export Excel</button>
+
 </div>
 
 </div>
 
 <footer>
-Money Tracker • Local Storage Web App
+Money Tracker • Local Storage
 </footer>
 
 <script>
 
-let transaksi = [];
-let currentMonthKey = new Date().getFullYear() + '-' + (new Date().getMonth()+1);
+let transaksi=[];
+
+let currentMonthKey=new Date().getFullYear()+"-"+(new Date().getMonth()+1);
+
+// TOTAL KESELURUHAN
+let totalMasukAll=parseInt(localStorage.getItem("totalMasukAll"))||0;
+let totalKeluarAll=parseInt(localStorage.getItem("totalKeluarAll"))||0;
 
 function formatRupiah(angka){
-return "Rp " + angka.toLocaleString("id-ID");
+return "Rp "+angka.toLocaleString("id-ID");
 }
 
 function simpanData(){
-localStorage.setItem("dataTransaksi", JSON.stringify(transaksi));
-localStorage.setItem("bulanTransaksi", currentMonthKey);
+
+localStorage.setItem("dataTransaksi",JSON.stringify(transaksi));
+localStorage.setItem("bulanTransaksi",currentMonthKey);
+
+localStorage.setItem("totalMasukAll",totalMasukAll);
+localStorage.setItem("totalKeluarAll",totalKeluarAll);
+
 }
 
 function loadData(){
-let savedMonth = localStorage.getItem("bulanTransaksi");
 
-if(savedMonth && savedMonth !== currentMonthKey){
+let savedMonth=localStorage.getItem("bulanTransaksi");
+
+if(savedMonth && savedMonth!==currentMonthKey){
 localStorage.removeItem("dataTransaksi");
 }
 
-let data = localStorage.getItem("dataTransaksi");
+let data=localStorage.getItem("dataTransaksi");
+
 if(data){
-transaksi = JSON.parse(data);
+transaksi=JSON.parse(data);
 }
+
 }
 
 function updateRingkasan(){
 
-let masuk = 0;
-let keluar = 0;
+let masuk=0;
+let keluar=0;
 
 transaksi.forEach(t=>{
-if(t.jenis === 'masuk') masuk += t.jumlah;
-if(t.jenis === 'keluar') keluar += t.jumlah;
+
+if(t.jenis==="masuk") masuk+=t.jumlah;
+if(t.jenis==="keluar") keluar+=t.jumlah;
+
 });
 
-let saldo = masuk - keluar;
+let saldo=masuk-keluar;
 
-document.getElementById('totalMasuk').innerText = formatRupiah(masuk);
-document.getElementById('totalKeluar').innerText = formatRupiah(keluar);
-document.getElementById('saldo').innerText = formatRupiah(saldo);
+document.getElementById("totalMasuk").innerText=formatRupiah(masuk);
+document.getElementById("totalKeluar").innerText=formatRupiah(keluar);
+document.getElementById("saldo").innerText=formatRupiah(saldo);
+
+document.getElementById("totalMasukAll").innerText=formatRupiah(totalMasukAll);
+document.getElementById("totalKeluarAll").innerText=formatRupiah(totalKeluarAll);
 
 }
 
 function renderTabel(){
 
-let tbody = document.getElementById("tabelTransaksi");
-tbody.innerHTML = "";
+let tbody=document.getElementById("tabelTransaksi");
+
+tbody.innerHTML="";
 
 transaksi.forEach((t,index)=>{
 
-let badge = t.jenis === 'masuk' ? '<span class="badgeMasuk">Masuk</span>' : '<span class="badgeKeluar">Keluar</span>';
+let badge=t.jenis==="masuk"
+?'<span class="badgeMasuk">Masuk</span>'
+:'<span class="badgeKeluar">Keluar</span>';
 
-let row = `<tr>
+let row=`<tr>
 <td>${t.tanggal}</td>
 <td>${badge}</td>
 <td>${t.kategori}</td>
@@ -328,7 +320,7 @@ let row = `<tr>
 <td><button class="deleteBtn" onclick="hapusTransaksi(${index})">Hapus</button></td>
 </tr>`;
 
-tbody.innerHTML += row;
+tbody.innerHTML+=row;
 
 });
 
@@ -336,25 +328,27 @@ tbody.innerHTML += row;
 
 function tambahTransaksi(){
 
-let jenis = document.getElementById("jenis").value;
-let kategori = document.getElementById("kategori").value;
-let jumlah = parseInt(document.getElementById("jumlah").value);
-let keterangan = document.getElementById("keterangan").value;
+let jenis=document.getElementById("jenis").value;
+let kategori=document.getElementById("kategori").value;
+let jumlah=parseInt(document.getElementById("jumlah").value.replace(/\D/g,""));
+let keterangan=document.getElementById("keterangan").value;
 
-if(!jumlah || !kategori){
+if(!jumlah||!kategori){
 alert("Isi data terlebih dahulu");
 return;
 }
 
-let now = new Date();
-let tanggal = now.toLocaleDateString("id-ID");
+let now=new Date();
+let tanggal=now.toLocaleDateString("id-ID");
 
 transaksi.push({tanggal,jenis,kategori,jumlah,keterangan});
+
+if(jenis==="masuk") totalMasukAll+=jumlah;
+else totalKeluarAll+=jumlah;
 
 simpanData();
 renderTabel();
 updateRingkasan();
-
 
 document.getElementById("kategori").value="";
 document.getElementById("jumlah").value="";
@@ -363,11 +357,49 @@ document.getElementById("keterangan").value="";
 }
 
 function hapusTransaksi(index){
+
 transaksi.splice(index,1);
+
 simpanData();
 renderTabel();
 updateRingkasan();
+
 }
+
+function exportExcel(){
+
+let csv="Tanggal,Jenis,Kategori,Jumlah,Keterangan\n";
+
+transaksi.forEach(t=>{
+csv+=`${t.tanggal},${t.jenis},${t.kategori},${t.jumlah},${t.keterangan}\n`;
+});
+
+let blob=new Blob([csv],{type:"text/csv"});
+let url=window.URL.createObjectURL(blob);
+
+let a=document.createElement("a");
+a.href=url;
+a.download="money_tracker.csv";
+a.click();
+
+}
+
+// FORMAT INPUT RUPIAH
+
+const jumlahInput=document.getElementById("jumlah");
+
+jumlahInput.addEventListener("input",function(e){
+
+let angka=e.target.value.replace(/\D/g,"");
+
+if(angka===""){
+e.target.value="";
+return;
+}
+
+e.target.value="Rp "+Number(angka).toLocaleString("id-ID");
+
+});
 
 loadData();
 renderTabel();
