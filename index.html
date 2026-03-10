@@ -392,6 +392,16 @@ document.getElementById("keterangan").value="";
 
 function hapusTransaksi(index){
 
+let data = transaksi[index];
+
+if(data.jenis === "masuk"){
+totalMasukAll -= data.jumlah;
+}
+
+if(data.jenis === "keluar"){
+totalKeluarAll -= data.jumlah;
+}
+
 transaksi.splice(index,1);
 
 simpanData();
@@ -447,6 +457,7 @@ renderTabel();
 
 </body>
 </html>
+
 
 
 
